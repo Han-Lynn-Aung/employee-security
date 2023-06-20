@@ -6,7 +6,10 @@
 </head>
 <body>
 <h2>Login</h2>
-<form th:action="@{/api/login}">
+<div th:if="${error}">
+    <p style="color: red;">Invalid username or password.</p>
+</div>
+<form th:action="@{/api/authenticate}" method="post">
     <div>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>

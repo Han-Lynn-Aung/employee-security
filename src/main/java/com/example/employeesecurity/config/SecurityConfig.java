@@ -1,11 +1,12 @@
 package com.example.employeesecurity.config;
 
 import com.example.employeesecurity.filter.JwtAuthenticationFilter;
-import com.example.employeesecurity.utils.JwtTokenProvider;
 import com.example.employeesecurity.service.EmployeeDetailsService;
 import com.example.employeesecurity.utils.JwtAuthenticationEntryPoint;
+import com.example.employeesecurity.utils.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,20 +38,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
                 http.authorizeRequests()
-                .antMatchers("/api/login").permitAll()
-                .antMatchers("/api/employees/**").authenticated()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin(form -> form
-                        .loginPage("/api/login")
-                        .defaultSuccessUrl("/api/employees/**")
-                        .loginProcessingUrl("/login")
-                        .failureForwardUrl("/login?error=true")
+                        .antMatchers("/api/authenticate")
                         .permitAll()
+                        .antMatchers("/api/employees/**")
+                        .authenticated()
+                        .anyRequest().authenticated()
+                        .and()
+                        .formLogin(form -> form
+                                .loginPage("/api/authenticate")
+                                .defaultSuccessUrl("/api/employees")
+                                .loginProcessingUrl("/authenticate")
+                                .failureForwardUrl("/api/authenticate?error=true")
+                                .permitAll()
                         )
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                        .logout()
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessUrl("/api/authenticate")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll().
+                        and()
+                        .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .and()
+                        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionFixation().migrateSession()
+                        .maximumSessions(1).maxSessionsPreventsLogin(true)
+                        .expiredUrl("/api/authenticate?expired=true");
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
