@@ -13,7 +13,7 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "Employee_Name", nullable = false, unique = true)
     @Size(min = 5, max = 250)

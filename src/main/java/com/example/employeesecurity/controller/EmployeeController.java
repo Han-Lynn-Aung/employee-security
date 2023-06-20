@@ -1,20 +1,14 @@
 package com.example.employeesecurity.controller;
 
-
-
-import com.example.employeesecurity.utils.JwtTokenProvider;
+import com.example.employeesecurity.repository.EmployeeRepository;
 import com.example.employeesecurity.model.Employee;
-import com.example.employeesecurity.model.JwtAuthenticationResponse;
-import com.example.employeesecurity.model.LoginForm;
 import com.example.employeesecurity.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,12 +19,9 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @PostMapping("/login")
+/*    @GetMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginForm loginForm) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword()));
@@ -39,9 +30,62 @@ public class EmployeeController {
 
         String jwt = jwtTokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
-    }
+    }*/
+
 
     @GetMapping
+    private String getAllEmployees(Model model) {
+        List<Employee> employees = employeeRepository.findAll();
+        model.addAttribute("employees", employees);
+        return "employee-list";
+    }
+
+    @GetMapping("/create")
+    private String showCreateForm(Model model) {
+        model.addAttribute("employee", new Employee());
+        return "employee-form";
+    }
+
+    @PostMapping("/create")
+    private String createEmployee(@Valid @ModelAttribute("employee") Employee employee, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "employee-form";
+        }
+        employeeRepository.save(employee);
+        return "redirect:/employees";
+    }
+
+    @GetMapping("/edit/{id}")
+    private String showEditForm(@PathVariable("id") long id, Model model) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid employee id: " + id));
+
+        model.addAttribute("employee", employee);
+        return "employee-form";
+    }
+
+    @PostMapping("/edit/{id}")
+    private String updateEmployee(@PathVariable("id") long id,@Valid @ModelAttribute("employee") Employee employee,
+                                  BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "employee-form";
+        }
+
+        employee.setId(id);
+        employeeRepository.save(employee);
+        return "redirect:/employees";
+    }
+
+    @GetMapping("/delete/{id}")
+    private String deleteEmployee(@PathVariable("id") long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid employee id: " + id));
+        employeeRepository.delete(employee);
+        return "redirect:/employees";
+    }
+
+   /* @GetMapping
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
@@ -64,5 +108,5 @@ public class EmployeeController {
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
-    }
+    }*/
 }

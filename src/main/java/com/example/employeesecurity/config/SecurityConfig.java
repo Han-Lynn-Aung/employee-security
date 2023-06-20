@@ -36,12 +36,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/api/employees/login").permitAll()
-                .antMatchers("/api/employees").authenticated()
+                http.authorizeRequests()
+                .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/employees/**").authenticated()
                 .anyRequest().authenticated()
                 .and()
+                .formLogin(form -> form
+                        .loginPage("/api/login")
+                        .defaultSuccessUrl("/api/employees/**")
+                        .loginProcessingUrl("/login")
+                        .failureForwardUrl("/login?error=true")
+                        .permitAll()
+                        )
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
