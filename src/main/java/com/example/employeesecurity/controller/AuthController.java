@@ -1,3 +1,4 @@
+/*
 package com.example.employeesecurity.controller;
 
 import com.example.employeesecurity.model.LoginForm;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -26,10 +28,17 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
 
-    @PostMapping ("/authenticate")
-    public ModelAndView authenticateUser(@ModelAttribute LoginForm loginForm, @RequestParam(value = "error", required = false) String error, HttpSession session) {
+   @GetMapping("/login")
+    public String loginForm(){
+        return "login-form";
+    }
+    @PostMapping (value ={"/authenticate"})
+    public ModelAndView authenticateUser(@RequestBody LoginForm loginForm, @RequestParam(value = "error", required = false) String error) {
+
+        System.out.println("in authenticalte funtion....");
+
         if (error != null) {
-            ModelAndView modelAndView = new ModelAndView("login-form");
+        ModelAndView  modelAndView = new ModelAndView("login-form");
             modelAndView.addObject("error", true);
             return modelAndView;
         }
@@ -41,39 +50,28 @@ public class AuthController {
 
         String jwt = jwtTokenProvider.generateToken(authentication);
 
-        // Store authenticated username and password in the session
-        session.setAttribute("username", loginForm.getUsername());
-        session.setAttribute("password", loginForm.getPassword());
-
-        ModelAndView modelAndView = new ModelAndView("redirect:/api/employees");
+       ModelAndView modelAndView = new ModelAndView("redirect:/api/employees");
         modelAndView.addObject("token", jwt);
         return modelAndView;
     }
 
     @GetMapping("/logout")
     public ModelAndView logoutForm() {
-        ModelAndView modelAndView = new ModelAndView("logout-form");
-        return modelAndView;
+
+        return new ModelAndView("logout-form");
     }
 
-    /*@PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(HttpServletRequest request, HttpServletResponse response) {
-        // Clear the authentication in SecurityContextHolder
+    @PostMapping("/logout")
+    @ResponseBody
+    public ResponseEntity<?> logoutUser() {
+
         SecurityContextHolder.clearContext();
-
-        // Invalidate the session (if using session-based authentication)
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-
-        }
-        // Clear the authentication cookie (if using remember-me functionality)
-        clearAuthenticationCookie(request, response, "remember-me-cookie-name");
 
         return ResponseEntity.ok("Logged out successfully");
     }
 
-    private void clearAuthenticationCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
+   */
+/* private void clearAuthenticationCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
         Cookie[] cookies = request.getCookies(); if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(cookieName)) {
@@ -85,5 +83,6 @@ public class AuthController {
                 }
             }
         }
-    }*/
-}
+    }*//*
+
+}*/
