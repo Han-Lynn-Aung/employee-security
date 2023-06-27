@@ -9,10 +9,10 @@
 <div th:if="${error}">
     <p style="color: red;">Invalid username or password.</p>
 </div>
-<form th:action="@{/api/employees/authenticate}" th:object="${loginForm}" method="POST" >
+<form th:action="@{/auth/login}" method="POST" >
     <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required>
     </div>
     <div>
         <label for="password">Password:</label>

@@ -1,16 +1,15 @@
 package com.example.employeesecurity.model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginForm {
+public class JwtRequest {
 
-    String username;
-    String password;
+    private String email;
+    private String password;
 }

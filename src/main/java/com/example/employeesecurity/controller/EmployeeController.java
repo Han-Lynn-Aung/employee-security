@@ -1,16 +1,9 @@
 package com.example.employeesecurity.controller;
 
-import com.example.employeesecurity.model.JwtAuthenticationResponse;
-import com.example.employeesecurity.model.LoginForm;
 import com.example.employeesecurity.repository.EmployeeRepository;
 import com.example.employeesecurity.model.Employee;
-import com.example.employeesecurity.service.EmployeeService;
-import com.example.employeesecurity.utils.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,49 +18,15 @@ import java.util.List;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
 
     @Autowired
     private EmployeeRepository employeeRepository;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-
     @GetMapping("/login")
-    private String loginForm(){
-
+    public String loginForm(){
         return "login-form";
     }
 
-    @RequestMapping(value = {"/authenticate"}, method = {RequestMethod.GET})
-    public ModelAndView authenticateUser(@RequestBody LoginForm loginForm, @RequestParam(value = "error", required = false) String error) {
-
-        System.out.println("in authentication function....");
-
-        if (error != null) {
-            ModelAndView  modelAndView = new ModelAndView("login-form");
-            modelAndView.addObject("error", true);
-            return modelAndView;
-        }
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String  jwt = jwtTokenProvider.generateToken(authentication);
-
-        ModelAndView modelAndView = new ModelAndView("redirect: /api/employees/");
-        modelAndView.addObject("token", jwt);
-        return modelAndView;
-    }
-
-    @GetMapping("/")
+    @GetMapping("/list")
     private String getAllEmployees(Model model) {
         List<Employee> employees = employeeRepository.findAll();
         model.addAttribute("employees", employees);
@@ -79,17 +38,6 @@ public class EmployeeController {
 
         return new ModelAndView("logout-form");
     }
-
-    @PostMapping("/logout")
-    @ResponseBody
-    public ResponseEntity<?> logoutUser() {
-
-        SecurityContextHolder.clearContext();
-
-        return ResponseEntity.ok("Logged out successfully");
-    }
-
-
 
     @GetMapping("/create")
     private String showCreateForm(Model model) {

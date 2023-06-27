@@ -25,7 +25,6 @@
                     <td>Employee Name</td>
                     <td>Employee Email</td>
                     <td>Employee Address</td>
-                    <td>Employee Password</td>
                     <td>Actions</td>
                 </tr>
             </thead>
@@ -34,7 +33,6 @@
                     <td th:text = "${employee.id}"></td>
                     <td th:text = "${employee.name}"></td>
                     <td th:text = "${employee.email}"></td>
-                    <td th:hidden = "${employee.password}"></td>
                     <td th:text = "${employee.address}"></td>
                     <td>
                         <a th:href="@{/api/employees/edit/{id}(id=${employee.id})}" class="btn btn-primary">Update</a>

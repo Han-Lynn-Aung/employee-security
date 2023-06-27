@@ -1,88 +1,63 @@
-/*
 package com.example.employeesecurity.controller;
 
-import com.example.employeesecurity.model.LoginForm;
+import com.example.employeesecurity.model.JwtResponse;
+import com.example.employeesecurity.model.JwtRequest;
+import com.example.employeesecurity.model.User;
 import com.example.employeesecurity.utils.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import javax.validation.Valid;
 
-import javax.servlet.http.*;
-
-
-@Controller
-@RequestMapping("/api")
+@RestController
 public class AuthController {
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
+    AuthenticationManager authManager;
     @Autowired
-    private AuthenticationManager authenticationManager;
+    JwtTokenProvider jwtTokenProvider;
 
+    @PostMapping(value = "/auth/login")
+    public ResponseEntity<?> login(@RequestBody @Valid JwtRequest request) {
+        try {
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(), request.getPassword())
+            );
 
-   @GetMapping("/login")
-    public String loginForm(){
-        return "login-form";
+            User user = (User) authentication.getPrincipal();
+            String accessToken = jwtTokenProvider.generateAccessToken(user);
+            JwtResponse response = new JwtResponse(user.getEmail(), accessToken);
+
+            return ResponseEntity.ok().body(response);
+
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
-    @PostMapping (value ={"/authenticate"})
-    public ModelAndView authenticateUser(@RequestBody LoginForm loginForm, @RequestParam(value = "error", required = false) String error) {
-
-        System.out.println("in authenticalte funtion....");
+}
+    /*@PostMapping (value ={"/authenticate"})
+    public String authenticateUser(@ModelAttribute("employee")Employee employee, @RequestParam(value = "error", required = false) String error, Model model) {
 
         if (error != null) {
-        ModelAndView  modelAndView = new ModelAndView("login-form");
-            modelAndView.addObject("error", true);
-            return modelAndView;
+            model.addAttribute("error", true);
+            return "login-form";
         }
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword()));
+                new UsernamePasswordAuthenticationToken(employee.getName(), employee.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtTokenProvider.generateToken(authentication);
 
-       ModelAndView modelAndView = new ModelAndView("redirect:/api/employees");
-        modelAndView.addObject("token", jwt);
-        return modelAndView;
-    }
+        model.addAttribute("token", jwt);
+        return "redirect:/api/employees/list";
+    }*/
 
-    @GetMapping("/logout")
-    public ModelAndView logoutForm() {
-
-        return new ModelAndView("logout-form");
-    }
-
-    @PostMapping("/logout")
-    @ResponseBody
-    public ResponseEntity<?> logoutUser() {
-
-        SecurityContextHolder.clearContext();
-
-        return ResponseEntity.ok("Logged out successfully");
-    }
-
-   */
-/* private void clearAuthenticationCookie(HttpServletRequest request, HttpServletResponse response, String cookieName) {
-        Cookie[] cookies = request.getCookies(); if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(cookieName)) {
-                    cookie.setValue("");
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                    break;
-                }
-            }
-        }
-    }*//*
-
-}*/
