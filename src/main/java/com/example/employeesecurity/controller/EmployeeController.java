@@ -1,5 +1,6 @@
 package com.example.employeesecurity.controller;
 
+import com.example.employeesecurity.model.User;
 import com.example.employeesecurity.repository.EmployeeRepository;
 import com.example.employeesecurity.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,12 @@ import java.util.List;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-
     @Autowired
     private EmployeeRepository employeeRepository;
+
     @GetMapping("/login")
-    public String loginForm(){
+    public String loginForm(Model model){
+        model.addAttribute("user", new User());
         return "login-form";
     }
 

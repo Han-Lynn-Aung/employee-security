@@ -73,7 +73,7 @@
   <hr>
   <h2>Save Employee</h2>
 
-  <form action="#" id="myForm"  th:object ="${employee}" th:action="${api/employee.id != null ? 'api/employees/edit/' + employee.id : 'api/employees/create'}" method="post" >
+  <form action="#" id="myForm"  th:object ="${employee}" th:action="${employee.id != null ? 'api/employees/edit/' + employee.id : 'api/employees/create'}" method="post" >
 
     <div>
       <label for="name">Name:</label>

@@ -23,7 +23,8 @@ public class AuthController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping(value = "/auth/login")
+    @PostMapping(value = "/auth/login", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody @Valid JwtRequest request) {
         try {
             Authentication authentication = authManager.authenticate(
