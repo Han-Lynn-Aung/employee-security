@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
+
 @RestController
 public class AuthController {
 
@@ -23,14 +24,25 @@ public class AuthController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping(value = "/auth/login", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/auth/login",
+            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE},
+            produces = {
+                    MediaType.APPLICATION_ATOM_XML_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE
+            })
+
     public ResponseEntity<?> login(@RequestBody @Valid JwtRequest request) {
+
+        System.out.println("JWTRequest : " + request);
+
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(), request.getPassword())
             );
+
+            System.out.println("Authentication : " + authentication);
 
             User user = (User) authentication.getPrincipal();
             String accessToken = jwtTokenProvider.generateAccessToken(user);

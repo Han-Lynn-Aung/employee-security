@@ -2,40 +2,70 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
-    </script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
     <title>Login</title>
 </head>
 <body>
-<h2>Login</h2>
-<div th:if="${error}">
-    <p style="color: red;">Invalid username or password.</p>
+<div class = "container">
+    <div class = "row">
+        <div class = "col-md-6 col-md-offset-3">
+
+            <h1> User Login Page </h1>
+            <form  th:action="@{/auth/login}"  method="POST">
+
+                <!-- error message -->
+                <div th:if="${param.error}">
+                    <div class="alert alert-danger">Invalid username or
+                        password.</div>
+                </div>
+
+                <!-- logout message -->
+                <div th:if="${param.logout}">
+                    <div class="alert alert-info">You have been logged out.</div>
+                </div>
+
+                <div class = "form-group">
+                    <label for ="email"> Email : </label>
+                    <input type="text" class = "form-control" id ="email" name = "email"
+                           placeholder="Enter Email ID" autofocus="autofocus" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password : </label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="Enter Password" required />
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <input type="submit" name="login-submit" id="login-submit"
+                                   class="form-control btn btn-primary" value="Log In" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-<form id="loginForm" th:action="@{/auth/login}" th:object="${user}" method="POST"  >
-    <div>
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" th:field="*{email}" required>
-    </div>
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" th:field="*{password}" required>
-    </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-</form>
 <script>
     document.getElementById('loginForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission
+        event.preventDefault(); // Prevent default form submission
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/auth/login');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/auth/login');
+        xhr.setRequestHeader('Content-Type', 'application/x-ww-form-urlencoded');
 
-    // Retrieve form data and send the request
-    var formData = new FormData(this);
-    xhr.send(formData);
-});
+        // Retrieve form data and send the request
+        var formData = {
+            email : document.getElementById('email').value,
+            password : document.getElementById('password').value
+        };
+        xhr.send(JSON.stringify(formData));
+    });
 </script>
 </body>
 </html>

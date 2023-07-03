@@ -22,23 +22,13 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @GetMapping("/login")
-    public String loginForm(Model model){
-        model.addAttribute("user", new User());
-        return "login-form";
-    }
+
 
     @GetMapping("/list")
     private String getAllEmployees(Model model) {
         List<Employee> employees = employeeRepository.findAll();
         model.addAttribute("employees", employees);
         return "employee-list";
-    }
-
-    @GetMapping("/logout")
-    public ModelAndView logoutForm() {
-
-        return new ModelAndView("logout-form");
     }
 
     @GetMapping("/create")

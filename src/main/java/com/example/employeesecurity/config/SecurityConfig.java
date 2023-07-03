@@ -42,10 +42,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/auth/login").permitAll()
-                .antMatchers("/api/employees/login").permitAll()
                 .antMatchers("/api/employees/**").authenticated()
                 .anyRequest().authenticated();
+
+
+   /*     http.formLogin(form -> form
+                .loginPage("/login")
+                .permitAll()
+                .loginProcessingUrl("/auth/login")
+                .defaultSuccessUrl("/api/employees/list")
+                .failureForwardUrl("/login")
+
+        );*/
+
 
         http.exceptionHandling()
                 .authenticationEntryPoint(
